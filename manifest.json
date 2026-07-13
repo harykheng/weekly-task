@@ -2,7 +2,7 @@
   "name": "Weekly Task",
   "short_name": "Weekly Task",
   "description": "Jadwal kerja mingguan by priority",
-  "start_url": "./weekly-task.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#15181d",

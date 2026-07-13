@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Weekly Task</title>
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#15181d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Weekly Task">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" href="./icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #15181d;
+    --bg-panel: #1c2027;
+    --bg-panel-hover: #232830;
+    --line: #2b313b;
+    --text: #ECEAE6;
+    --text-dim: #8b93a1;
+    --accent: #E8A33D;
+    --done: #3FA796;
+    --danger: #d9694f;
+    --research: #5B8DEF;
+    --admin: #9D7BD8;
+    --padel: #E8618C;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
+  body{padding-bottom:70px;}
+  .wrap{max-width:640px;margin:0 auto;padding:28px 18px 0;}
+
+  header{margin-bottom:20px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin:0 0 6px;line-height:1.1;}
+  .sub{color:var(--text-dim);font-size:13.5px;line-height:1.5;margin:0;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:12px 14px;margin:18px 0 6px;font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .dot.p1{background:var(--danger);}
+  .dot.p2{background:var(--accent);}
+  .dot.p3{background:var(--text-dim);}
+  .dot.p4{background:var(--research);}
+  .dot.p5{background:var(--admin);}
+  .dot.p6{background:var(--padel);}
+
+  .day{margin-top:24px;border-top:1px solid var(--line);padding-top:14px;}
+  .day-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+  .day-name{font-family:'Fraunces',serif;font-size:19px;font-weight:600;}
+  .day-progress{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);}
+
+  .task{
+    display:flex;align-items:flex-start;gap:11px;background:var(--bg-panel);
+    border:1px solid var(--line);border-radius:9px;padding:11px 12px;margin-bottom:8px;
+    transition:background .2s, opacity .2s;
+  }
+  .task.done{opacity:0.4;}
+  .task.done .task-text{text-decoration:line-through;}
+  .chk{
+    width:19px;height:19px;border-radius:6px;border:1.5px solid var(--text-dim);
+    flex:none;margin-top:1px;position:relative;cursor:pointer;background:transparent;
+  }
+  .chk.checked{background:var(--done);border-color:var(--done);}
+  .chk.checked::after{
+    content:'';position:absolute;left:5px;top:1px;width:5px;height:9px;
+    border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(40deg);
+  }
+  .task-body{flex:1;min-width:0;}
+  .task-text{font-size:14px;line-height:1.4;outline:none;word-break:break-word;}
+  .task-text[contenteditable]:focus{color:var(--accent);}
+  .task-meta{display:flex;gap:8px;align-items:center;margin-top:3px;}
+  .task-time{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-dim);}
+  .task-time[contenteditable]:focus{color:var(--accent);}
+  .task-cat{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-dim);}
+  .task-prio{width:4px;border-radius:3px;flex:none;align-self:stretch;margin-right:1px;}
+  .p1{background:var(--danger);}
+  .p2{background:var(--accent);}
+  .p3{background:var(--line);}
+  .p4{background:var(--research);}
+  .p5{background:var(--admin);}
+  .p6{background:var(--padel);}
+  .del{flex:none;color:var(--text-dim);font-size:16px;line-height:1;cursor:pointer;padding:2px 4px;margin-top:-2px;}
+
+  .add-row{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  .add-time{
+    background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
+    border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:12px;padding:0 6px;flex:none;width:90px;height:34px;
+  }
+  .add-cat{
+    background:var(--bg-panel);border:1px solid var(--line);color:var(--text-dim);
+    border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:11px;padding:0 6px;flex:none;width:92px;height:34px;
+  }
+  .add-input{
+    flex:1;background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
+    border-radius:7px;font-size:13px;padding:8px 10px;min-width:120px;height:34px;
+  }
+  .add-input::placeholder{color:var(--text-dim);}
+  .add-btn{
+    flex:none;background:var(--accent);color:#1a1200;border:none;border-radius:7px;
+    font-size:13px;font-weight:600;padding:0 14px;cursor:pointer;height:34px;
+  }
+
+  .weekend{margin-top:30px;border-top:1px solid var(--line);padding-top:16px;}
+  .weekend-title{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:4px;}
+  .weekend-note{font-size:12.5px;color:var(--text-dim);margin-bottom:12px;}
+  .weekend-day{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);margin:14px 0 6px;}
+
+  footer{max-width:640px;margin:26px auto 0;padding:0 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+  .reset-btn{
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-dim);
+    background:none;border:1px solid var(--line);border-radius:7px;padding:8px 12px;cursor:pointer;flex:none;
+  }
+  .reset-btn:active{background:var(--bg-panel);}
+  .hint{font-size:11px;color:var(--text-dim);max-width:280px;text-align:right;line-height:1.4;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Weekly Task</div>
+    <h1>Jadwal Kerja</h1>
+    <p class="sub">Senin–Jumat: kerja by jam, auto-sort. Sabtu–Minggu: santai, cek ringan aja. Ketuk teks/jam buat edit, ketuk kotak buat centang, tambah task lewat form di bawah tiap hari — termasuk jadwal padel.</p>
+  </header>
+
+  <div class="legend">
+    <span><i class="dot p1"></i>Blocker</span>
+    <span><i class="dot p2"></i>Revenue</span>
+    <span><i class="dot p3"></i>Maintenance</span>
+    <span><i class="dot p4"></i>Research</span>
+    <span><i class="dot p5"></i>Admin</span>
+    <span><i class="dot p6"></i>Padel</span>
+  </div>
+
+  <div id="days"></div>
+
+  <div class="weekend">
+    <div class="weekend-title">Sabtu &amp; Minggu</div>
+    <div class="weekend-note">Sengaja dibikin minim — cuma cek data, ga ada target baru. Sisanya buat istirahat.</div>
+    <div class="weekend-day">Sabtu</div>
+    <div id="sabtu"></div>
+    <div class="weekend-day">Minggu</div>
+    <div id="minggu"></div>
+  </div>
+
+  <footer>
+    <button class="reset-btn" onclick="resetWeek()">Reset centang minggu ini</button>
+    <div class="hint">Data & task custom kesimpen lokal di browser HP/laptop ini. File apa adanya bisa lo upload ke GitHub.</div>
+  </footer>
+</div>
+
+<script>
+const CAT_LABEL = { 1:'Blocker', 2:'Revenue', 3:'Maintenance', 4:'Research', 5:'Admin', 6:'Padel' };
+
+const defaultSchedule = {
+  senin: [
+    { p:1, time:"08:00", text:"Lanjut migrasi data Shopee baru" },
+    { p:2, time:"13:00", text:"Konten TikTok Studio Harel — before/after case study" },
+    { p:2, time:"15:00", text:"Follow up client Studio Harel (pakai template chat)" },
+    { p:2, time:"17:00", text:"Cek chat masuk Beauty House + push 1 promo bundling" },
+    { p:5, time:"17:30", text:"Rekap stock & cek pesanan masuk" },
+  ],
+  selasa: [
+    { p:1, time:"08:00", text:"Lanjut migrasi data Shopee baru" },
+    { p:2, time:"15:00", text:"Follow up client Studio Harel (pakai template chat)" },
+    { p:2, time:"17:00", text:"Cek chat masuk Beauty House + push 1 promo bundling" },
+    { p:5, time:"17:30", text:"Balas chat customer Beauty House yang numpuk" },
+    { p:2, time:"20:00", text:"Cek status lead lama yang belum closing" },
+  ],
+  rabu: [
+    { p:1, time:"08:00", text:"Target migrasi data Shopee kelar" },
+    { p:2, time:"13:00", text:"Konten TikTok Studio Harel" },
+    { p:2, time:"15:00", text:"Follow up client Studio Harel (pakai template chat)" },
+    { p:2, time:"17:00", text:"Cek chat masuk Beauty House + push 1 promo bundling" },
+    { p:5, time:"17:30", text:"Update pembukuan / catatan pengeluaran" },
+  ],
+  kamis: [
+    { p:2, time:"08:00", text:"Upload produk ke toko Shopee baru" },
+    { p:2, time:"13:00", text:"Post Threads affiliate" },
+    { p:2, time:"15:00", text:"Follow up client Studio Harel (pakai template chat)" },
+    { p:2, time:"17:00", text:"Cek chat masuk Beauty House + push 1 promo bundling" },
+    { p:5, time:"17:30", text:"Follow up invoice / pembayaran client Studio Harel" },
+  ],
+  jumat: [
+    { p:2, time:"08:00", text:"Konten TikTok Studio Harel" },
+    { p:5, time:"13:00", text:"Progress closing Unculture — jual sisa stock" },
+    { p:2, time:"15:00", text:"Follow up client Studio Harel — nudge terakhir sequence" },
+    { p:2, time:"17:00", text:"Cek chat masuk Beauty House + push 1 promo bundling" },
+    { p:4, time:"20:00", text:"Evaluasi performa konten & lead minggu ini" },
+  ],
+};
+
+const weekendDefault = {
+  sabtu: [ { p:3, time:"10:00", text:"Cek ads Beauty House sekilas, itu aja" } ],
+  minggu: [ { p:3, time:"10:00", text:"Cek chat/notif penting doang, sisanya libur" } ],
+};
+
+const dayLabels = { senin:"Senin", selasa:"Selasa", rabu:"Rabu", kamis:"Kamis", jumat:"Jumat" };
+
+const STORE = 'weekly-task-state-v4';
+
+function loadAll(){
+  try {
+    const raw = localStorage.getItem(STORE);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  } catch(e){ return null; }
+}
+function saveAll(data){
+  try { localStorage.setItem(STORE, JSON.stringify(data)); } catch(e){}
+}
+
+let data = loadAll();
+if(!data){
+  data = { tasks:{}, weekend:{}, checked:{} };
+  Object.keys(defaultSchedule).forEach(d => {
+    data.tasks[d] = defaultSchedule[d].map((t,i) => ({ id:d+'-'+i, ...t }));
+  });
+  Object.keys(weekendDefault).forEach(d => {
+    data.weekend[d] = weekendDefault[d].map((t,i) => ({ id:d+'-'+i, ...t }));
+  });
+  saveAll(data);
+}
+
+const daysEl = document.getElementById('days');
+
+function sortByTime(list){
+  return [...list].sort((a,b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
+}
+
+function renderDay(dayKey){
+  const tasks = sortByTime(data.tasks[dayKey]);
+  const doneCount = tasks.filter(t => data.checked[t.id]).length;
+
+  const dayDiv = document.createElement('div');
+  dayDiv.className = 'day';
+  dayDiv.innerHTML = `<div class="day-head">
+      <div class="day-name">${dayLabels[dayKey]}</div>
+      <div class="day-progress">${doneCount}/${tasks.length}</div>
+    </div>`;
+
+  tasks.forEach(t => {
+    const isDone = !!data.checked[t.id];
+    const row = document.createElement('div');
+    row.className = 'task' + (isDone ? ' done' : '');
+    row.innerHTML = `
+      <div class="task-prio p${t.p}"></div>
+      <div class="chk${isDone ? ' checked' : ''}"></div>
+      <div class="task-body">
+        <div class="task-text" contenteditable="true">${t.text}</div>
+        <div class="task-meta">
+          <div class="task-time" contenteditable="true">${t.time}</div>
+          <div class="task-cat">${CAT_LABEL[t.p]}</div>
+        </div>
+      </div>
+      <div class="del">×</div>`;
+    row.querySelector('.chk').onclick = () => {
+      data.checked[t.id] = !data.checked[t.id];
+      saveAll(data);
+      render();
+    };
+    row.querySelector('.task-text').addEventListener('blur', (e) => {
+      t.text = e.target.textContent.trim();
+      saveAll(data);
+    });
+    row.querySelector('.task-time').addEventListener('blur', (e) => {
+      const v = e.target.textContent.trim();
+      if(/^\d{1,2}:\d{2}$/.test(v)) t.time = v;
+      else e.target.textContent = t.time;
+      saveAll(data);
+      render();
+    });
+    row.querySelector('.del').onclick = () => {
+      data.tasks[dayKey] = data.tasks[dayKey].filter(x => x.id !== t.id);
+      delete data.checked[t.id];
+      saveAll(data);
+      render();
+    };
+    dayDiv.appendChild(row);
+  });
+
+  const addRow = document.createElement('div');
+  addRow.className = 'add-row';
+  addRow.innerHTML = `
+    <input class="add-time" type="time" value="09:00">
+    <select class="add-cat">
+      <option value="2" selected>Revenue</option>
+      <option value="1">Blocker</option>
+      <option value="3">Maintenance</option>
+      <option value="4">Research</option>
+      <option value="5">Admin</option>
+      <option value="6">Padel</option>
+    </select>
+    <input class="add-input" type="text" placeholder="Tambah task...">
+    <button class="add-btn">+</button>`;
+  const input = addRow.querySelector('.add-input');
+  const catSel = addRow.querySelector('.add-cat');
+  const timeInput = addRow.querySelector('.add-time');
+  function addTask(){
+    const text = input.value.trim();
+    if(!text) return;
+    const id = dayKey + '-' + Date.now();
+    data.tasks[dayKey].push({ id, p:parseInt(catSel.value,10), time:timeInput.value || "09:00", text });
+    saveAll(data);
+    render();
+  }
+  addRow.querySelector('.add-btn').onclick = addTask;
+  input.addEventListener('keydown', (e) => { if(e.key === 'Enter') addTask(); });
+  dayDiv.appendChild(addRow);
+
+  daysEl.appendChild(dayDiv);
+}
+
+function renderWeekend(dayKey, containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  sortByTime(data.weekend[dayKey]).forEach(t => {
+    const isDone = !!data.checked[t.id];
+    const row = document.createElement('div');
+    row.className = 'task' + (isDone ? ' done' : '');
+    row.innerHTML = `
+      <div class="task-prio p${t.p}"></div>
+      <div class="chk${isDone ? ' checked' : ''}"></div>
+      <div class="task-body">
+        <div class="task-text" contenteditable="true">${t.text}</div>
+        <div class="task-meta"><div class="task-time">${t.time}</div></div>
+      </div>`;
+    row.querySelector('.chk').onclick = () => {
+      data.checked[t.id] = !data.checked[t.id];
+      saveAll(data);
+      render();
+    };
+    row.querySelector('.task-text').addEventListener('blur', (e) => {
+      t.text = e.target.textContent.trim();
+      saveAll(data);
+    });
+    container.appendChild(row);
+  });
+}
+
+function render(){
+  daysEl.innerHTML = '';
+  Object.keys(dayLabels).forEach(renderDay);
+  renderWeekend('sabtu', 'sabtu');
+  renderWeekend('minggu', 'minggu');
+}
+
+function resetWeek(){
+  if(!confirm('Reset semua centang minggu ini?')) return;
+  data.checked = {};
+  saveAll(data);
+  render();
+}
+
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
